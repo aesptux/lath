@@ -46,7 +46,7 @@ io.sockets.on('connection', function (socket) {
     
     // sad panda is sad with this event
     socket.on('disconnect', function() {
-        delete username[socket.username];
+        delete usernames[socket.username];
         io.sockets.emit('updateusers', usernames);
         // broadcast
         socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected.');
