@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<title>Lath - Web chat with latex support</title>
+	</head>
+
+	<body>
+	<div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+		<b>USERS</b>
+		<div id="users"></div>
+	</div>
+	<div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+		<div id="conversation"></div>
+		<input id="data" style="width:200px;" />
+		<input type="button" id="datasend" value="send" />
+	</div>	
+
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/client.js"></script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+MathJax.Hub.Config({
+ extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+ jax: ["input/TeX", "output/HTML-CSS"],
+ tex2jax: {
+     inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+     displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+ },
+ "HTML-CSS": { availableFonts: ["TeX"] }
+});
+</script> 
+
+	</body>
+</html>
