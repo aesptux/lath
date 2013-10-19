@@ -37,8 +37,19 @@ io.sockets.on('connection', function (socket) {
         socket.username = username;
         usernames[username] = username;
         socket.emit('updatechat', 'SERVER', 'You have connected.');
-        
+        // broadcast to all users
+        socket.broadcast.emit('updatechat', 'SERVER', username + ' has connected.');
+        // update list client side
+        io.sockets.emit('updateusers', usernames);
      
+    });
+    
+    // sad panda is sad with this event
+    socket.on('disconnect', function() {
+        delete username[socket.username];
+        io.sockets.emit('updateusers', usernames);
+        // broadcast
+        socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected.');
     });
     
 });
