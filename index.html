@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>Lath - Web chat with latex support</title>
+	</head>
+
+	<body>
+	<div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+		<b>USERS</b>
+		<div id="users"></div>
+	</div>
+	<div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+		<div id="conversation"></div>
+		<input id="data" style="width:200px;" />
+		<input type="button" id="datasend" value="send" />
+	</div>	
+
+
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/core.js"></script>
+	</body>
+</html>
