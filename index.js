@@ -64,6 +64,10 @@ io.sockets.on('connection', function (socket) {
     
     socket.on('adduser', function(username) {
         socket.username = username;
+        if (usernames[socket.username]) {
+            socket.emit('connect', true);
+            return 0;
+        }
         socket.room = 'Calculus';
         usernames[username] = username;
         socket.join('Calculus');

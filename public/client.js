@@ -9,10 +9,16 @@ var txt = document.getElementById('data');
 var btnsend = document.getElementById('datasend');
 
 
-socket.on('connect', function () {
+socket.on('connect', function (exists) {
     var username = null;
+    console.log(exists);
     while (username == null) {
-        username = prompt('Set your username');
+        if (exists) {
+            username = prompt('The username is taken. Please, choose another.');
+        } else {
+            username = prompt('Set your username');
+        }
+        
     }
     socket.emit('adduser', username);
 });
@@ -43,7 +49,6 @@ socket.on('updaterooms', function (rooms, current_room) {
 
 socket.on('updateusers', function (data) {
     users.innerHTML = "";
-    console.log('asfsdaf user');
     for (var user in data) {
         users.innerHTML += "<div class='user'>" + data[user] + "</div>";
     }
