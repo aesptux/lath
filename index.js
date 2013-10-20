@@ -1,16 +1,13 @@
 var express = require('express');
 var path = require('path');
+var mysql = require('mysql');    
+//var mustache = require("mustache");
 var app = express();
 var port = 3700;
 
-//// templates live here
-//app.set('views', __dirname + '/templates');
+
 // statics
 app.use(express.static(path.join(__dirname, 'public')));
-//app.set(express.static(__dirname + '/public'));
-//app.set('view engine', 'jade');
-//app.engine('jade', require('jade').__express);
-
 
 // define usernames
 var usernames = {};
@@ -18,14 +15,38 @@ var usernames = {};
 // define rooms
 var rooms = ['Calculus', 'Discrete Mathematics', 'Logic'];
 
+var connection = mysql.createConnection({
+  host     : 'adrianespinosa.com',
+  user     : 'devuser',
+  password : 'devuser1101',
+  database : 'lath'
+});
+
+connection.connect();
+
 
 // routes
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
+    res.sendfile(__dirname + '/index.html');
 });
+//app.get('/log', function (req,res) {
+//    var html = "";
+//    connection.query('SELECT username, message FROM chat_log', function(err, rows, fields) {
+//        if (err) throw err;
+//        query = rows;
+//        console.log(rows[0].username);
+//        for (var row in rows) {
+//            html += "<div><b>" + rows[row].username + ":</b>" + rows[row].message + "</div>";    
+//        }
+//        
+//        res.send(html);
+//    });
+//    
+//});
 
 // socket
 var io = require('socket.io').listen(app.listen(port));
+
 
 // define events
 io.sockets.on('connection', function (socket) {
@@ -33,7 +54,12 @@ io.sockets.on('connection', function (socket) {
     // when clients emit...
 
     socket.on('sendchat', function(data) {
-        io.sockets.to(socket.room).emit('updatechat', socket.username, data);    
+        io.sockets.to(socket.room).emit('updatechat', socket.username, data);  
+        data = data.replace(/\\/g, '\\\\');
+        connection.query('INSERT INTO chat_log(username, message, room) VALUES ("' + socket.username + '", "' + data + '", "' + socket.room + '")', function(err, rows, fields) {
+          if (err) throw err;
+        });
+        
     });
     
     socket.on('adduser', function(username) {
