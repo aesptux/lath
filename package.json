@@ -1,0 +1,12 @@
+{
+    "name": "Lath",
+    "version": "0.0.1",
+    "description": "Web chat with LaTeX support",
+    "dependencies": {
+        "socket.io": "latest",
+        "express": "latest",
+	"mustache": "latest",
+	"mysql@2.0.0-alpha9": "mysql@2.0.0-alpha9"
+    },
+    "author": "Adrian Espinosa (aesptux)"
+}
