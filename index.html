@@ -1,0 +1,97 @@
+<html>
+<head>
+	<title>Lath - Web chat with LaTeX support</title>
+	<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+	<style>
+	body {
+		background-color: #E0E4CC;
+		padding: 5%;
+		font-family: Raleway;
+	}
+	.user {
+		color: #53777A;
+	}
+	.message {
+		color: #222222;
+	}
+	a, a:visited {
+		color: #F38630;
+	}
+	.title {
+		font-size: 24px;
+	}
+
+	#rooms_title {
+		float:left;
+		width: 14%;
+		border-right: 1px solid black;
+		overflow:scroll-y;
+		height: 100%;
+	}
+	#users_title {
+		float:right;
+		width: 11%;
+		border-left: 1px solid black;
+		padding-left: 10px;
+		overflow:scroll-y;
+		height: 100%
+	}
+	#content {
+		width: 65%;
+		overflow: auto;
+		height: 100%;
+		float: left;
+		padding: 15px;
+	}
+	#data {
+		width:80%;
+	}
+	#footer {
+		clear: both;
+	}
+	.reference {
+		font-size: 12px;
+	}
+	</style>
+</head>
+
+<body>
+	<div id='rooms_title'>
+		<b class='title'>ROOMS</b>
+		<div id="rooms"></div>
+	</div>
+	<div id='users_title'>
+		<b class='title'>USERS</b>
+		<div id="users"></div>
+	</div>
+	<div id='content' >
+		<div id="conversation"></div>
+		<input id="data" />
+		<input type="button" id="datasend" value="send" />
+	</div>
+
+	<div id='footer'>
+		<a class='reference' href='http://en.wikibooks.org/wiki/LaTeX/Mathematics#Symbols'>LaTeX reference</a>
+		<p class='reference'>To write latex, remember to write the code within \$<br> Like \$ p \land (q \lor (p \rightarrow)) \$</p>
+		<!-- <a href='/log' class='reference'>Chat log.</a> -->
+		<!-- <p>$p \land (q \lor (p \rightarrow))$</p> -->
+	</div>
+
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/client.js"></script>
+	<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+	MathJax.Hub.Config({
+		extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+		jax: ["input/TeX", "output/HTML-CSS"],
+		tex2jax: {
+			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+			displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+			processEscapes: true
+		},
+		"HTML-CSS": { availableFonts: ["TeX"] }
+	});
+	</script>
+
+</body>
+</html>
