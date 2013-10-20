@@ -16,9 +16,9 @@ var usernames = {};
 var rooms = ['Calculus', 'Discrete Mathematics', 'Logic'];
 
 var connection = mysql.createConnection({
-  host     : 'adrianespinosa.com',
-  user     : 'devuser',
-  password : 'devuser1101',
+  host     : '',
+  user     : '',
+  password : '',
   database : 'lath'
 });
 
