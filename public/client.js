@@ -8,16 +8,24 @@ var conversation = document.getElementById('conversation');
 var txt = document.getElementById('data');
 var btnsend = document.getElementById('datasend');
 
+
 socket.on('connect', function () {
-    socket.emit('adduser', prompt('Set your username'));
+    var username = null;
+    while (username == null) {
+        username = prompt('Set your username');
+    }
+    socket.emit('adduser', username);
 });
 
+
 socket.on('updatechat', function (username, data) {
-    conversation.innerHTML += '<b>' + username +  ': </b>' + data + '<br />';
+    conversation.innerHTML += '<b class="user">' + username +  ': </b><span class="message">' + data + '</span><br />';
     // update MathJax with new DOM elements
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,"conversation"]);
+    document.getElementById('content').scrollTop = document.getElementById('content').scrollHeight;
     
 });
+
 
 socket.on('updaterooms', function (rooms, current_room) {
     console.log('Updating rooms');
@@ -32,18 +40,21 @@ socket.on('updaterooms', function (rooms, current_room) {
     }
 });
 
+
 socket.on('updateusers', function (data) {
     users.innerHTML = "";
     console.log('asfsdaf user');
     for (var user in data) {
-        users.innerHTML += "<div>" + data[user] + "</div>";
+        users.innerHTML += "<div class='user'>" + data[user] + "</div>";
     }
 });
+
 
 function switchRoom(room) {
     console.log('Changing room');
     socket.emit('switchroom', room);
 }
+
 
 window.onload = function () {
     btnsend.addEventListener('click', function () {
@@ -58,10 +69,7 @@ window.onload = function () {
             btnsend.click();
         }
         
-    }, false)
-    
-    
-            
+    }, false)  
             
 }  
     
