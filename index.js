@@ -15,6 +15,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // define usernames
 var usernames = {};
 
+// define rooms
+var rooms = ['Calculus', 'Discrete Mathematics', 'Logic'];
+
 
 // routes
 app.get('/', function (req, res) {
@@ -30,18 +33,31 @@ io.sockets.on('connection', function (socket) {
     // when clients emit...
 
     socket.on('sendchat', function(data) {
-        io.sockets.emit('updatechat', socket.username, data);    
+        io.sockets.to(socket.room).emit('updatechat', socket.username, data);    
     });
     
     socket.on('adduser', function(username) {
         socket.username = username;
+        socket.room = 'Calculus';
         usernames[username] = username;
-        socket.emit('updatechat', 'SERVER', 'You have connected.');
+        socket.join('Calculus');
+        socket.emit('updatechat', 'SERVER', 'You have connected to Calculus.');
         // broadcast to all users
-        socket.broadcast.emit('updatechat', 'SERVER', username + ' has connected.');
+        socket.broadcast.to('Calculus').emit('updatechat', 'SERVER', username + ' has connected.');
         // update list client side
         io.sockets.emit('updateusers', usernames);
-     
+        socket.emit('updaterooms', rooms, 'Calculus');
+    });
+    
+    socket.on('switchroom', function (newroom) {
+        socket.leave(socket.room);
+        socket.join(newroom);
+        socket.emit('updatechat', 'SERVER', 'You have connected to ' + newroom + '.');
+        socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left the room.');
+        socket.room = newroom;
+        socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has joined the room');
+        socket.emit('updaterooms', rooms, newroom);
+        
     });
     
     // sad panda is sad with this event
@@ -50,6 +66,7 @@ io.sockets.on('connection', function (socket) {
         io.sockets.emit('updateusers', usernames);
         // broadcast
         socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected.');
+        socket.leave(socket.room);
     });
     
 });
