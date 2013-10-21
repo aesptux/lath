@@ -7,6 +7,7 @@ var rooms_list = document.getElementById('rooms');
 var conversation = document.getElementById('conversation');
 var txt = document.getElementById('data');
 var btnsend = document.getElementById('datasend');
+var content = document.getElementById('content');
 
 
 socket.on('connect', function (exists) {
@@ -18,18 +19,19 @@ socket.on('connect', function (exists) {
         } else {
             username = prompt('Set your username');
         }
-        
+
     }
     socket.emit('adduser', username);
 });
 
 
 socket.on('updatechat', function (username, data) {
-    conversation.innerHTML += '<b class="user">' + username +  ': </b><span class="message">' + data + '</span><br />';
+    conversation.innerHTML += '<b class="user">' + username +
+        ': </b><span class="message">' + data + '</span><br />';
     // update MathJax with new DOM elements
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,"conversation"]);
-    document.getElementById('content').scrollTop = document.getElementById('content').scrollHeight;
-    
+    content.scrollTop = content.scrollHeight;
+
 });
 
 
@@ -41,7 +43,9 @@ socket.on('updaterooms', function (rooms, current_room) {
         if (rooms[room] == current_room) {
             rooms_list.innerHTML += '<div><b>' + rooms[room] + '</b></div>';
         } else {
-            rooms_list.innerHTML += '<div><a href="#" onclick="switchRoom(\''+rooms[room]+'\')">' + rooms[room] + '</a></div>';
+            rooms_list.innerHTML += '<div><a href="#" \
+            onclick="switchRoom(\''+rooms[room]+'\')">' + rooms[room] +
+            '</a></div>';
         }
     }
 });
@@ -66,18 +70,17 @@ window.onload = function () {
         console.log('asfsd');
         socket.emit('sendchat', document.getElementById('data').value);
         document.getElementById('data').value = '';
-                    
+
     }, false);
-    
+
     txt.addEventListener('keypress', function (e) {
         if (e.keyCode == 13) {
             btnsend.click();
         }
-        
-    }, false)  
-            
-}  
-    
-    
 
-    
+    }, false)
+
+}
+
+
+
