@@ -1,9 +1,15 @@
 var express = require('express');
 var path = require('path');
-var mysql = require('mysql');    
+var mysql = require('mysql');
 //var mustache = require("mustache");
 var app = express();
 var port = 3700;
+var pool = mysql.createPool({
+    host     : '',
+    user     : '',
+    password : '',
+    database : 'lath'
+});
 
 
 // statics
@@ -15,14 +21,14 @@ var usernames = {};
 // define rooms
 var rooms = ['Calculus', 'Discrete Mathematics', 'Logic'];
 
-var connection = mysql.createConnection({
-  host     : '',
-  user     : '',
-  password : '',
-  database : 'lath'
-});
+// var connection = mysql.createConnection({
+//   host     : '',
+//   user     : '',
+//   password : '',
+//   database : 'lath'
+// });
 
-connection.connect();
+// connection.connect();
 
 
 // routes
@@ -36,12 +42,12 @@ app.get('/', function (req, res) {
 //        query = rows;
 //        console.log(rows[0].username);
 //        for (var row in rows) {
-//            html += "<div><b>" + rows[row].username + ":</b>" + rows[row].message + "</div>";    
+//            html += "<div><b>" + rows[row].username + ":</b>" + rows[row].message + "</div>";
 //        }
-//        
+//
 //        res.send(html);
 //    });
-//    
+//
 //});
 
 // socket
@@ -50,18 +56,29 @@ var io = require('socket.io').listen(app.listen(port));
 
 // define events
 io.sockets.on('connection', function (socket) {
-    
+
     // when clients emit...
 
     socket.on('sendchat', function(data) {
-        io.sockets.to(socket.room).emit('updatechat', socket.username, data);  
+        io.sockets.to(socket.room).emit('updatechat', socket.username, data);
         data = data.replace(/\\/g, '\\\\');
-        connection.query('INSERT INTO chat_log(username, message, room) VALUES ("' + socket.username + '", "' + data + '", "' + socket.room + '")', function(err, rows, fields) {
-          if (err) throw err;
+
+        pool.getConnection(function(err, connection) {
+          // Use the connection
+          connection.query('INSERT INTO chat_log(username, message, room) VALUES ("' + socket.username + '", "' + data + '", "' + socket.room + '")', function(err, rows) {
+            // And done with the connection.
+            connection.release();
+
+            // Don't use the connection here, it has been returned to the pool.
+          });
         });
-        
+
+        // connection.query('INSERT INTO chat_log(username, message, room) VALUES ("' + socket.username + '", "' + data + '", "' + socket.room + '")', function(err, rows, fields) {
+        //   if (err) throw err;
+        // });
+
     });
-    
+
     socket.on('adduser', function(username) {
         socket.username = username;
         if (usernames[socket.username]) {
@@ -78,7 +95,7 @@ io.sockets.on('connection', function (socket) {
         io.sockets.emit('updateusers', usernames);
         socket.emit('updaterooms', rooms, 'Calculus');
     });
-    
+
     socket.on('switchroom', function (newroom) {
         socket.leave(socket.room);
         socket.join(newroom);
@@ -87,9 +104,9 @@ io.sockets.on('connection', function (socket) {
         socket.room = newroom;
         socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has joined the room');
         socket.emit('updaterooms', rooms, newroom);
-        
+
     });
-    
+
     // sad panda is sad with this event
     socket.on('disconnect', function() {
         delete usernames[socket.username];
@@ -98,7 +115,7 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected.');
         socket.leave(socket.room);
     });
-    
+
 });
 
 console.log('Listening...');
