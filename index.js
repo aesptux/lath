@@ -3,6 +3,12 @@ var path = require('path');
 var mysql = require('mysql');
 var app = express();
 var port = 3700;
+var pool = mysql.createPool({
+    host     : '',
+    user     : '',
+    password : '',
+    database : 'lath'
+});
 
 
 // statics
@@ -14,20 +20,26 @@ var usernames = {};
 // define rooms
 var rooms = ['Calculus', 'Discrete Mathematics', 'Logic'];
 
-var connection = mysql.createConnection({
-  host     : '',
-  user     : '',
-  password : '',
-  database : 'lath'
-});
-
-connection.connect();
-
 
 // routes
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/index.html');
 });
+
+//app.get('/log', function (req,res) {
+//    var html = "";
+//    connection.query('SELECT username, message FROM chat_log', function(err, rows, fields) {
+//        if (err) throw err;
+//        query = rows;
+//        console.log(rows[0].username);
+//        for (var row in rows) {
+//            html += "<div><b>" + rows[row].username + ":</b>" + rows[row].message + "</div>";
+//        }
+//
+//        res.send(html);
+//    });
+//
+//});
 
 
 // socket
@@ -42,10 +54,16 @@ io.sockets.on('connection', function (socket) {
     socket.on('sendchat', function(data) {
         io.sockets.to(socket.room).emit('updatechat', socket.username, data);
         data = data.replace(/\\/g, '\\\\');
-        connection.query('INSERT INTO chat_log(username, message, room) VALUES\
-         ("' + socket.username + '", "' + data + '", "' + socket.room + '")',
-         function(err, rows, fields) {
-          if (err) throw err;
+        pool.getConnection(function(err, connection) {
+          // Use the connection
+          connection.query('INSERT INTO chat_log(username, message, room) \
+            VALUES ("' + socket.username + '", "' + data + '", "' +
+                socket.room + '")', function(err, rows) {
+            // release connection, do not close
+            connection.release();
+
+
+          });
         });
 
     });
